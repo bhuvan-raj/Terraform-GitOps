@@ -18,11 +18,12 @@ terraform {
 # Provision a Kind Cluster
 resource "null_resource" "kind_cluster" {
   provisioner "local-exec" {
-    command = "kind create cluster --name my-gitops-cluster"
+    command = "sudo sh -c 'kind create cluster --name my-gitops-cluster'"
   }
+
   provisioner "local-exec" {
     when    = destroy
-    command = "kind delete cluster --name my-gitops-cluster"
+    command = "sudo sh -c 'kind delete cluster --name my-gitops-cluster'"
   }
 }
 
