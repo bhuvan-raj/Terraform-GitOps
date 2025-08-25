@@ -41,12 +41,18 @@ jobs:
         run: terraform init
         working-directory: ./terraform
 
-      - name: Terraform Apply
+      - name: Terraform Apply - Create Cluster
+        run: terraform apply -auto-approve -target=null_resource.kind_cluster
+        working-directory: ./terraform
+        env:
+          KUBECONFIG: /home/runner/.kube/config
+      
+      - name: Terraform Apply - Install Tools
         run: terraform apply -auto-approve
         working-directory: ./terraform
         env:
-          # Use the local kubeconfig for communication with the cluster
-          KUBECONFIG: ~/.kube/config
+          KUBECONFIG: /home/runner/.kube/config
+
 
       - name: Update Kubernetes Manifest with new image tag
         run: |
