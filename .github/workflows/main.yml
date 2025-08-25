@@ -36,6 +36,22 @@ jobs:
         run: |
           IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.sha }}
           trivy image --exit-code 1 --severity HIGH,CRITICAL $IMAGE_NAME
+          
+      - name: Ensure Docker Service is Running
+        run: sudo systemctl start docker
+      
+      - name: Wait for Docker Daemon
+        run: |
+          for i in $(seq 1 10); do
+            if sudo docker info > /dev/null 2>&1; then
+              echo "Docker daemon is running!"
+              exit 0
+            fi
+            echo "Waiting for Docker daemon to start..."
+            sleep 1
+          done
+          echo "Docker daemon failed to start after 10 seconds."
+          exit 1
 
       - name: Terraform Init
         run: terraform init
