@@ -45,13 +45,14 @@ jobs:
         run: terraform apply -auto-approve -target=null_resource.kind_cluster
         working-directory: ./terraform
         env:
-          KUBECONFIG: /home/runner/.kube/config
+          HOME: /tmp/runner_home
+          KUBECONFIG: /tmp/runner_home/.kube/config
       
       - name: Terraform Apply - Install Tools
         run: terraform apply -auto-approve
         working-directory: ./terraform
         env:
-          KUBECONFIG: /home/runner/.kube/config
+          KUBECONFIG: /tmp/runner_home/.kube/config
 
 
       - name: Update Kubernetes Manifest with new image tag
