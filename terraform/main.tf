@@ -29,7 +29,7 @@ provider "helm" {
 
 resource "null_resource" "minikube_cluster" {
   provisioner "local-exec" {
-    command = "minikube start --driver=docker --profile=my-gitops-cluster --extra-config=kubelet.cgroup-driver=systemd"
+    command = "minikube start --driver=docker --profile=my-gitops-cluster --memory=8192 --cpus=4 --extra-config=kubelet.cgroup-driver=systemd"
   }
 
   provisioner "local-exec" {
@@ -56,6 +56,7 @@ resource "helm_release" "prometheus" {
   chart      = "kube-prometheus-stack"
   namespace  = "monitoring"
   create_namespace = true
+  timeout    = 1200 # 20 minutes
 }
 
 # ArgoCD Application
