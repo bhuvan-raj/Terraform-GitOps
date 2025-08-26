@@ -15,16 +15,14 @@ terraform {
   }
 }
 
-# Provision a Kind Cluster
-# Provision a Kind Cluster
-resource "null_resource" "kind_cluster" {
+resource "null_resource" "minikube_cluster" {
   provisioner "local-exec" {
-    command = "sudo sh -c '/home/bubu/bin/kind create cluster --name my-gitops-cluster'"
+    command = "sudo sh -c 'minikube start --driver=docker --profile=my-gitops-cluster'"
   }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "sudo sh -c '/home/bubu/bin/kind delete cluster --name my-gitops-cluster'"
+    command = "sudo sh -c 'minikube delete --profile=my-gitops-cluster'"
   }
 }
 
@@ -65,8 +63,8 @@ resource "kubernetes_manifest" "my_app_argocd" {
       }
       project = "default"
       source = {
-        repoURL        = "https://github.com/your-username/your-repo-name.git" # Replace with your repo
-        targetRevision = "HEAD"
+        repoURL        = "https://github.com/kiranrajeev1/Terraform-GitOps.git" # Replace with your repo
+        targetRevision = "main"
         path           = "manifests/my-app"
       }
       syncPolicy = {
