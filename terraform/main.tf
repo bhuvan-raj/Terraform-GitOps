@@ -65,8 +65,8 @@ resource "kubernetes_manifest" "my_app_argocd" {
       }
       project = "default"
       source = {
-        repoURL        = "https://github.com/your-username/your-repo-name.git" # Replace with your repo
-        targetRevision = "HEAD"
+        repoURL        = "https://github.com/bhuvan-raj/Terraform-GitOps.git" # Replace with your repo
+        targetRevision = "main"
         path           = "manifests/my-app"
       }
       syncPolicy = {
