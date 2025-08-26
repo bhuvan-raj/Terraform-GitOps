@@ -29,7 +29,7 @@ provider "helm" {
 
 resource "null_resource" "minikube_cluster" {
   provisioner "local-exec" {
-    command = "minikube start --driver=docker --profile=my-gitops-cluster"
+    command = "minikube start --driver=docker --profile=my-gitops-cluster --extra-config=kubelet.cgroup-driver=systemd"
   }
 
   provisioner "local-exec" {
