@@ -4,18 +4,22 @@ terraform {
       source  = "hashicorp/null"
       version = "~> 3.0"
     }
-    helm = {
-      source  = "hashicorp/helm"
-      version = "~> 2.11"
-    }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.22"
-    }
   }
 }
 
-# Provision a Kind Cluster
+# Provider configurations
+# This is a temporary provider config for the `null` resource.
+# The Kubernetes and Helm providers will be configured in `tools.tf`.
+provider "kubernetes" {
+  config_path = "~/.kube/config"
+}
+
+provider "helm" {
+  kubernetes {
+    config_path = "~/.kube/config"
+  }
+}
+
 # Provision a Kind Cluster
 resource "null_resource" "kind_cluster" {
   provisioner "local-exec" {
