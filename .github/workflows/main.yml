@@ -51,8 +51,7 @@ jobs:
       - name: Ensure kubeconfig for Minikube
         run: |
           mkdir -p /tmp/runner_home/.kube
-          minikube update-context --profile=my-gitops-cluster
-          minikube kubeconfig --profile=my-gitops-cluster > /tmp/runner_home/.kube/config
+          minikube -p my-gitops-cluster kubeconfig > /tmp/runner_home/.kube/config
 
       - name: Terraform Apply - Install Tools
         run: terraform apply -auto-approve
