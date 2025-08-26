@@ -17,12 +17,12 @@ terraform {
 
 resource "null_resource" "minikube_cluster" {
   provisioner "local-exec" {
-    command = "sudo sh -c 'minikube start --driver=docker --profile=my-gitops-cluster'"
+    command = "minikube start --driver=docker --profile=my-gitops-cluster"
   }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "sudo sh -c 'minikube delete --profile=my-gitops-cluster'"
+    command = "minikube delete --profile=my-gitops-cluster"
   }
 }
 
