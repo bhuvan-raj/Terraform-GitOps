@@ -10,6 +10,9 @@ jobs:
   build-and-deploy:
     # Use 'self-hosted' to specify a local runner
     runs-on: kiran
+    env:
+      HOME: /tmp/runner_home
+      KUBECONFIG: /tmp/runner_home/.kube/config
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -44,23 +47,10 @@ jobs:
       - name: Terraform Apply - Create Minikube Cluster
         run: terraform apply -auto-approve -target=null_resource.minikube_cluster
         working-directory: ./terraform
-        env:
-          HOME: /tmp/runner_home
-          KUBECONFIG: /tmp/runner_home/.kube/config
-
-      - name: Ensure kubeconfig for Minikube
-        run: |
-          mkdir -p /tmp/runner_home/.kube
-          minikube -p my-gitops-cluster update-context
-          cp $HOME/.kube/config /tmp/runner_home/.kube/config
-
 
       - name: Terraform Apply - Install Tools
         run: terraform apply -auto-approve
         working-directory: ./terraform
-        env:
-          KUBECONFIG: /tmp/runner_home/.kube/config
-
 
       - name: Update Kubernetes Manifest with new image tag
         run: |
