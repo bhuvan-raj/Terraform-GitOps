@@ -1,4 +1,4 @@
-name: GitOps CD Pipeline with Local Runner
+name: GitOps CD Pipeline Tf
 
 on:
   push:
