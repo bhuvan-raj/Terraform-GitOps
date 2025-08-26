@@ -28,7 +28,7 @@ resource "null_resource" "minikube_cluster" {
 
 # ArgoCD Helm Chart
 resource "helm_release" "argocd" {
-  depends_on = [null_resource.kind_cluster]
+  depends_on = [null_resource.minikube_cluster]
   name       = "argocd"
   repository = "https://argoproj.github.io/argo-helm"
   chart      = "argo-cd"
@@ -38,7 +38,7 @@ resource "helm_release" "argocd" {
 
 # Prometheus and Grafana Helm Chart
 resource "helm_release" "prometheus" {
-  depends_on = [null_resource.kind_cluster]
+  depends_on = [null_resource.minikube_cluster]
   name       = "prometheus-stack"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
