@@ -24,7 +24,7 @@ jobs:
           
       - name: Log in to Docker Hub as root
         run: |
-          echo ${{ secrets.DOCKERHUB_TOKEN }} | sudo docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
       - name: Build and Push Docker image
         id: build_push
@@ -43,19 +43,6 @@ jobs:
           
       - name: Ensure Docker Service is Running
         run: sudo systemctl start docker
-      
-      - name: Wait for Docker Daemon
-        run: |
-          for i in $(seq 1 10); do
-            if sudo docker info > /dev/null 2>&1; then
-              echo "Docker daemon is running!"
-              exit 0
-            fi
-            echo "Waiting for Docker daemon to start..."
-            sleep 1
-          done
-          echo "Docker daemon failed to start after 10 seconds."
-          exit 1
 
       - name: Terraform Init
         run: terraform init
@@ -77,8 +64,6 @@ jobs:
 
       - name: Update Kubernetes Manifest with new image tag
         run: |
-          # Note: 'sed -i' may behave differently on macOS/Linux.
-          # Use 'sed -i.bak' for macOS compatibility
           sed -i 's|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.sha }}|' manifests/my-app/deployment.yaml
 
       - name: Commit and Push changes to manifests
