@@ -9,7 +9,7 @@ on:
 jobs:
   build-and-deploy:
     # Use 'self-hosted' to specify a local runner
-    runs-on: bubu
+    runs-on: kiran
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
