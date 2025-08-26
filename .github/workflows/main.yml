@@ -41,13 +41,13 @@ jobs:
         run: terraform init
         working-directory: ./terraform
 
-      - name: Terraform Apply - Create Cluster
-        run: terraform apply -auto-approve -target=null_resource.kind_cluster
+      - name: Terraform Apply - Create Minikube Cluster
+        run: terraform apply -auto-approve -target=null_resource.minikube_cluster
         working-directory: ./terraform
         env:
           HOME: /tmp/runner_home
           KUBECONFIG: /tmp/runner_home/.kube/config
-      
+
       - name: Terraform Apply - Install Tools
         run: terraform apply -auto-approve
         working-directory: ./terraform
