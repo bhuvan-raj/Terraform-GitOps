@@ -37,9 +37,6 @@ jobs:
           IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.sha }}
           trivy image --exit-code 1 --severity HIGH,CRITICAL $IMAGE_NAME
           
-      - name: Ensure Docker Service is Running
-        run: sudo systemctl start docker
-
       - name: Terraform Init
         run: terraform init
         working-directory: ./terraform
