@@ -15,6 +15,19 @@ terraform {
   }
 }
 
+provider "kubernetes" {
+  config_path = "${pathexpand("~/.kube/config")}"
+  config_context = "minikube"
+}
+
+provider "helm" {
+  kubernetes {
+    config_path = "${pathexpand("~/.kube/config")}"
+    config_context = "minikube"
+  }
+}
+
+
 resource "null_resource" "minikube_cluster" {
   provisioner "local-exec" {
     command = "minikube start --driver=docker --profile=my-gitops-cluster"
