@@ -15,48 +15,50 @@ terraform {
   }
 }
 
+# Provider configurations
 provider "kubernetes" {
-  config_path    = "/tmp/runner_home/.kube/config"
+  config_path = "/tmp/runner_home/.kube/config"
   config_context = "my-gitops-cluster"
 }
 
 provider "helm" {
   kubernetes {
-    config_path    = "/tmp/runner_home/.kube/config"
+    config_path = "/tmp/runner_home/.kube/config"
     config_context = "my-gitops-cluster"
   }
 }
 
-resource "null_resource" "minikube_cluster" {
+# Provision a Kind Cluster
+resource "null_resource" "kind_cluster" {
   provisioner "local-exec" {
-    command = "minikube start --driver=docker --profile=my-gitops-cluster --memory=8192 --cpus=4 --extra-config=kubelet.cgroup-driver=systemd"
+    command = "sudo sh -c 'kind create cluster --name my-gitops-cluster'"
   }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "minikube delete --profile=my-gitops-cluster"
+    command = "sudo sh -c 'kind delete cluster --name my-gitops-cluster'"
   }
 }
 
 # ArgoCD Helm Chart
 resource "helm_release" "argocd" {
-  depends_on = [null_resource.minikube_cluster]
-  name       = "argocd"
-  repository = "https://argoproj.github.io/argo-helm"
-  chart      = "argo-cd"
-  namespace  = "argocd"
+  depends_on       = [null_resource.kind_cluster]
+  name             = "argocd"
+  repository       = "https://argoproj.github.io/argo-helm"
+  chart            = "argo-cd"
+  namespace        = "argocd"
   create_namespace = true
 }
 
 # Prometheus and Grafana Helm Chart
 resource "helm_release" "prometheus" {
-  depends_on = [null_resource.minikube_cluster]
-  name       = "prometheus-stack"
-  repository = "https://prometheus-community.github.io/helm-charts"
-  chart      = "kube-prometheus-stack"
-  namespace  = "monitoring"
+  depends_on       = [null_resource.kind_cluster]
+  name             = "prometheus-stack"
+  repository       = "https://prometheus-community.github.io/helm-charts"
+  chart            = "kube-prometheus-stack"
+  namespace        = "monitoring"
   create_namespace = true
-  timeout    = 1200 # 20 minutes
+  timeout          = 1200 # 20 minutes
 }
 
 # ArgoCD Application
@@ -76,7 +78,7 @@ resource "kubernetes_manifest" "my_app_argocd" {
       }
       project = "default"
       source = {
-        repoURL        = "https://github.com/kiranrajeev1/Terraform-GitOps.git" # Replace with your repo
+        repoURL        = "https://github.com/kiranrajeev1/Terraform-GitOps.git"
         targetRevision = "main"
         path           = "manifests/my-app"
       }
