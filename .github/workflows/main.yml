@@ -48,7 +48,11 @@ jobs:
         run: terraform apply -auto-approve -target=null_resource.minikube_cluster
         working-directory: ./terraform
 
-      - name: Terraform Apply - Install Tools
+      - name: Terraform Apply - Install Helm Charts (ArgoCD, Prometheus)
+        run: terraform apply -auto-approve -target=helm_release.argocd -target=helm_release.prometheus
+        working-directory: ./terraform
+
+      - name: Terraform Apply - Create ArgoCD Application
         run: terraform apply -auto-approve
         working-directory: ./terraform
 
