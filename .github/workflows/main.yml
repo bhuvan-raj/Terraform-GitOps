@@ -1,4 +1,4 @@
-name: GitOps CD Pipeline with Local Runner
+name: GitOps CD Pipeline Tf
 
 on:
   push:
@@ -9,7 +9,10 @@ on:
 jobs:
   build-and-deploy:
     # Use 'self-hosted' to specify a local runner
-    runs-on: bubu
+    runs-on: kiran
+    env:
+      HOME: /tmp/runner_home
+      KUBECONFIG: /tmp/runner_home/.kube/config
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -22,10 +25,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
-      - name: Log in to Docker Hub as root
-        run: |
-          echo ${{ secrets.DOCKERHUB_TOKEN }} | sudo docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-
       - name: Build and Push Docker image
         id: build_push
         uses: docker/build-push-action@v4
@@ -41,44 +40,24 @@ jobs:
           IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.sha }}
           trivy image --exit-code 1 --severity HIGH,CRITICAL $IMAGE_NAME
           
-      - name: Ensure Docker Service is Running
-        run: sudo systemctl start docker
-      
-      - name: Wait for Docker Daemon
-        run: |
-          for i in $(seq 1 10); do
-            if sudo docker info > /dev/null 2>&1; then
-              echo "Docker daemon is running!"
-              exit 0
-            fi
-            echo "Waiting for Docker daemon to start..."
-            sleep 1
-          done
-          echo "Docker daemon failed to start after 10 seconds."
-          exit 1
-
       - name: Terraform Init
         run: terraform init
         working-directory: ./terraform
 
-      - name: Terraform Apply - Create Cluster
-        run: terraform apply -auto-approve -target=null_resource.kind_cluster
+      - name: Terraform Apply - Create Minikube Cluster
+        run: terraform apply -auto-approve -target=null_resource.minikube_cluster
         working-directory: ./terraform
-        env:
-          HOME: /tmp/runner_home
-          KUBECONFIG: /tmp/runner_home/.kube/config
-      
-      - name: Terraform Apply - Install Tools
+
+      - name: Terraform Apply - Install Helm Charts (ArgoCD, Prometheus)
+        run: terraform apply -auto-approve -target=helm_release.argocd -target=helm_release.prometheus
+        working-directory: ./terraform
+
+      - name: Terraform Apply - Create ArgoCD Application
         run: terraform apply -auto-approve
         working-directory: ./terraform
-        env:
-          KUBECONFIG: /tmp/runner_home/.kube/config
-
 
       - name: Update Kubernetes Manifest with new image tag
         run: |
-          # Note: 'sed -i' may behave differently on macOS/Linux.
-          # Use 'sed -i.bak' for macOS compatibility
           sed -i 's|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.sha }}|' manifests/my-app/deployment.yaml
 
       - name: Commit and Push changes to manifests

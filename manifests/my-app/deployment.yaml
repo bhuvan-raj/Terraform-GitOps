@@ -20,6 +20,6 @@ spec:
       containers:
       - name: my-app
         # This image tag will be replaced by the CI/CD pipeline
-        image: bhuvanraj123/my-app
+        image: kiran700/my-app:701603907b5fe39dcf1376e537cbdca068a44c29
         ports:
         - containerPort: 5000
