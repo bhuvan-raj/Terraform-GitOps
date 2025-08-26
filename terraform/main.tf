@@ -16,17 +16,16 @@ terraform {
 }
 
 provider "kubernetes" {
-  config_path = "${pathexpand("~/.kube/config")}"
-  config_context = "minikube"
+  config_path    = "/tmp/runner_home/.kube/config"
+  config_context = "my-gitops-cluster"
 }
 
 provider "helm" {
   kubernetes {
-    config_path = "${pathexpand("~/.kube/config")}"
-    config_context = "minikube"
+    config_path    = "/tmp/runner_home/.kube/config"
+    config_context = "my-gitops-cluster"
   }
 }
-
 
 resource "null_resource" "minikube_cluster" {
   provisioner "local-exec" {
